@@ -6,6 +6,8 @@ import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import java.time.LocalDateTime;
 
+import com.reservation.model.enums.Role;
+
 @Entity
 @Table(name = "users")
 @Data

@@ -1,4 +1,4 @@
-package com.reservationg.repository;
+package com.reservation.repository;
 
 import com.reservation.model.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
