@@ -8,27 +8,45 @@
 		<version>3.5.14</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>com.coworking</groupId>
-	<artifactId>booking.api</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
-	<name/>
-	<description/>
+	
+	<groupId>com.reservation</groupId>
+	<artifactId>booking-api</artifactId>
+	<version>1.0.0</version>
+	<name>resource-booking-api</name>
+	<description>API REST for managing shared resource bookings</description>
 	<url/>
+	
+	
 	<licenses>
-		<license/>
+		<license>
+			<name>MIT License</name>
+			<url>https://opensource.org/licenses/MIT</url>
+			<distribution>repo</distribution>
+		</license>
 	</licenses>
+	
 	<developers>
-		<developer/>
+		 <developer>
+			<name>Uriel Lara</name>
+			<email>laracastrouriel@gmail.com</email>
+			<url>https://github.com/UrieLara</url>
+			<roles>
+				<role>Developer</role>
+			</roles>
+		</developer>
 	</developers>
+	
 	<scm>
 		<connection/>
 		<developerConnection/>
 		<tag/>
 		<url/>
 	</scm>
+	
 	<properties>
-		<java.version>17</java.version>
+		<java.version>21</java.version>
 	</properties>
+
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -40,14 +58,25 @@
 		</dependency>
 
 		<dependency>
-			<groupId>com.mysql</groupId>
-			<artifactId>mysql-connector-j</artifactId>
-			<scope>runtime</scope>
-		</dependency>
-		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-security</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-validation</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.mysql</groupId>
+			<artifactId>mysql-connector-j</artifactId>
+			<scope>runtime</scope>
 		</dependency>
 
 		<dependency>
@@ -65,6 +94,30 @@
 			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
 			<version>2.8.5</version>
 		</dependency>
+
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<optional>true</optional>
+		</dependency>
+
+		<dependency>
+			<groupId>io.jsonwebtoken</groupId>
+			<artifactId>jjwt-api</artifactId>
+			<version>0.12.6</version>
+		</dependency>
+		<dependency>
+			<groupId>io.jsonwebtoken</groupId>
+			<artifactId>jjwt-impl</artifactId>
+			<version>0.12.6</version>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>io.jsonwebtoken</groupId>
+			<artifactId>jjwt-jackson</artifactId>
+			<version>0.12.6</version>
+			<scope>runtime</scope>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -72,6 +125,12 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.11.0</version> 
 			</plugin>
 		</plugins>
 	</build>
