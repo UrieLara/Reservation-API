@@ -39,7 +39,7 @@ CREATE TABLE reservations (
 
 -- Datos iniciales
 INSERT INTO users (name, email, password, role) VALUES 
-('Admin User', 'admin@coworking.com', '$2a$10$dXJ3SW6G7P50lGmMkkmwe.20cQQubK3.HZWzG3YB1tlRy.fqvM/BG', 'ADMIN');
+('Admin User', 'admin@coworking.com', '$2a$10$OHEEP8tPgL/UrkVDiCjoLeXucdkyzVM66W78MU8poIiTzGSfmvTp6', 'ADMIN');
 
 INSERT INTO resources (name, description, capacity, location) VALUES
 ('Sala de Conferencias A', 'Sala con proyector y pizarra', 20, 'Piso 1, Ala norte'),
