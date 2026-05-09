@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
@@ -61,5 +62,24 @@ public class ReservationController {
         
         boolean available = reservationService.isResourceAvailable(resourceId, startDateTime, endDateTime);
         return ResponseEntity.ok(available);
+    }
+
+    @DeleteMapping("/{id}")
+    @Operation(summary = "Cancelar una reserva existente")
+    public ResponseEntity<Void> cancelReservation(
+            @PathVariable Long id,
+            @RequestParam(required = false, defaultValue = "Cancelada por el usuario") String reason,
+            @AuthenticationPrincipal UserDetails userDetails) {
+        
+        String userEmail = userDetails.getUsername();
+        reservationService.cancelReservation(id, userEmail, reason);
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/admin/all")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Obtener todas las reservas del sistema (solo ADMIN)")
+    public ResponseEntity<List<ReservationResponse>> getAllReservations() {
+        return ResponseEntity.ok(reservationService.getAllReservations());
     }
 }

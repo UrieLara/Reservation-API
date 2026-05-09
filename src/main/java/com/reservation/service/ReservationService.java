@@ -116,4 +116,42 @@ public class ReservationService {
                 reservation.getCreatedAt()
         );
     }
+
+    @Transactional
+    public void cancelReservation(Long reservationId, String userEmail, String reason) {
+        
+        Reservation reservation = reservationRepository.findById(reservationId)
+                .orElseThrow(() -> new RuntimeException("Reserva no encontrada con ID: " + reservationId));
+        
+        if (reservation.getStatus() != ReservationStatus.ACTIVE) {
+            throw new RuntimeException("Solo se pueden cancelar reservas activas");
+        }
+        
+        boolean isOwner = reservation.getUser().getEmail().equals(userEmail);
+        boolean isAdmin = userEmail.equals("admin@coworking.com"); // O verificar rol
+        
+        if (!isOwner && !isAdmin) {
+            throw new RuntimeException("No tienes permiso para cancelar esta reserva");
+        }
+        
+        // REGLA DE NEGOCIO: Solo se puede cancelar con 2+ horas de anticipación
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime startTime = reservation.getStartDateTime();
+        
+        if (startTime.isBefore(now.plusHours(2))) {
+            throw new RuntimeException("No se puede cancelar una reserva con menos de 2 horas de anticipación");
+        }
+        
+        reservation.setStatus(ReservationStatus.CANCELLED);
+        reservation.setCancellationReason(reason);
+        
+        reservationRepository.save(reservation);
+    }
+
+    public List<ReservationResponse> getAllReservations() {
+    return reservationRepository.findAll()
+            .stream()
+            .map(this::toResponse)
+            .collect(Collectors.toList());
+    }
 }
