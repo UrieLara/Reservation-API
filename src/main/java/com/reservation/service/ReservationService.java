@@ -1,11 +1,14 @@
 package com.reservation.service;
 
+import com.reservation.exception.BusinessException;
+import com.reservation.exception.ResourceNotFoundException;
 import com.reservation.model.dto.ReservationRequest;
 import com.reservation.model.dto.ReservationResponse;
 import com.reservation.model.entity.Reservation;
 import com.reservation.model.entity.Resource;
 import com.reservation.model.entity.User;
 import com.reservation.model.enums.ReservationStatus;
+import com.reservation.model.enums.Role;
 import com.reservation.repository.ReservationRepository;
 import com.reservation.repository.ResourceRepository;
 import com.reservation.repository.UserRepository;
@@ -35,33 +38,29 @@ public class ReservationService {
     @Transactional
     public ReservationResponse createReservation(ReservationRequest request, String userEmail) {
         
-        // 1. Validar que el recurso existe y está activo
         Resource resource = resourceRepository.findById(request.getResourceId())
-                .orElseThrow(() -> new RuntimeException("Recurso no encontrado con ID: " + request.getResourceId()));
+                .orElseThrow(() -> new ResourceNotFoundException("Recurso no encontrado con ID: " + request.getResourceId()));
         
         if (!resource.getIsActive()) {
-            throw new RuntimeException("El recurso no está disponible");
+            throw new BusinessException("El recurso no está disponible");
         }
         
-        // 2. Validar que el usuario existe
         User user = userRepository.findByEmail(userEmail)
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
         
-        // 3. Validar que las fechas son correctas
         if (request.getStartDateTime().isAfter(request.getEndDateTime())) {
-            throw new RuntimeException("La fecha de inicio debe ser anterior a la fecha de fin");
+            throw new BusinessException("La fecha de inicio debe ser anterior a la fecha de fin");
         }
         
         if (request.getStartDateTime().isBefore(LocalDateTime.now())) {
-            throw new RuntimeException("No se puede reservar en el pasado");
+            throw new BusinessException("No se puede reservar fechas pasadas");
         }
         
-        // 4. Validar que no hay conflictos de horario (¡CORAZÓN DE LA LÓGICA!)
         List<Reservation> conflicts = reservationRepository.findConflictingReservations(
                 resource, request.getStartDateTime(), request.getEndDateTime());
         
         if (!conflicts.isEmpty()) {
-            throw new RuntimeException("Conflicto de horario: El recurso ya está reservado en ese período");
+            throw new BusinessException("Conflicto de horario: El recurso ya está reservado en ese período");
         }
         
         // 5. Crear la reserva
@@ -80,7 +79,7 @@ public class ReservationService {
     // Obtener reservas del usuario actual
     public List<ReservationResponse> getUserReservations(String userEmail) {
         User user = userRepository.findByEmail(userEmail)
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
         
         List<Reservation> reservations = reservationRepository.findByUserIdAndStatus(
                 user.getId(), ReservationStatus.ACTIVE);
@@ -93,7 +92,7 @@ public class ReservationService {
     // Verificar disponibilidad de un recurso en una fecha
     public boolean isResourceAvailable(Long resourceId, LocalDateTime start, LocalDateTime end) {
         Resource resource = resourceRepository.findById(resourceId)
-                .orElseThrow(() -> new RuntimeException("Recurso no encontrado"));
+                .orElseThrow(() -> new ResourceNotFoundException("Recurso no encontrado"));
         
         List<Reservation> conflicts = reservationRepository.findConflictingReservations(
                 resource, start, end);
@@ -121,17 +120,20 @@ public class ReservationService {
     public void cancelReservation(Long reservationId, String userEmail, String reason) {
         
         Reservation reservation = reservationRepository.findById(reservationId)
-                .orElseThrow(() -> new RuntimeException("Reserva no encontrada con ID: " + reservationId));
+                .orElseThrow(() -> new ResourceNotFoundException("Reserva no encontrada con ID: " + reservationId));
         
         if (reservation.getStatus() != ReservationStatus.ACTIVE) {
-            throw new RuntimeException("Solo se pueden cancelar reservas activas");
+            throw new BusinessException("Solo se pueden cancelar reservas activas");
         }
         
+         User currentUser = userRepository.findByEmail(userEmail)
+            .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
+            
         boolean isOwner = reservation.getUser().getEmail().equals(userEmail);
-        boolean isAdmin = userEmail.equals("admin@coworking.com"); // O verificar rol
+         boolean isAdmin = currentUser.getRole() == Role.ADMIN;
         
         if (!isOwner && !isAdmin) {
-            throw new RuntimeException("No tienes permiso para cancelar esta reserva");
+            throw 	new BusinessException("No tienes permiso para cancelar esta reserva");
         }
         
         // REGLA DE NEGOCIO: Solo se puede cancelar con 2+ horas de anticipación
@@ -139,7 +141,7 @@ public class ReservationService {
         LocalDateTime startTime = reservation.getStartDateTime();
         
         if (startTime.isBefore(now.plusHours(2))) {
-            throw new RuntimeException("No se puede cancelar una reserva con menos de 2 horas de anticipación");
+            throw new BusinessException("No se puede cancelar una reserva con menos de 2 horas de anticipación");
         }
         
         reservation.setStatus(ReservationStatus.CANCELLED);
