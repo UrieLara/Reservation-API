@@ -72,7 +72,7 @@ src/main/java/com/reservation
   "email": "admin@coworking.com",
   "password": "admin123"
 }
-
+```
 **Respuesta:**
 ```json
 {
@@ -81,7 +81,7 @@ src/main/java/com/reservation
   "email": "admin@coworking.com",
   "role": "ADMIN"
 }
-
+```
 ---
 
 ## 🏢 Resources
@@ -183,7 +183,7 @@ src/main/java/com/reservation
   "startDateTime": "2026-05-10T10:00:00",
   "endDateTime": "2026-05-10T11:00:00"
 }
-
+```
 ---
 
 ## ⚠️ Reglas de negocio
@@ -253,16 +253,6 @@ http://localhost:8080/swagger-ui/index.html
 
 ---
 
-## 🧠 Lo que aprendí / mi rol
-
-Desarrollé completamente la API backend aplicando arquitectura en capas con Spring Boot.
-
-Implementé autenticación JWT, validación de conflictos de reservas, y manejo global de excepciones.
-
-También trabajé con migraciones Flyway, testing unitario e integración usando Mockito y Spring Boot Test.
-
----
-
 ## ⚙️ Variables de entorno
 
 Configurar en `application.properties`:
@@ -310,13 +300,16 @@ El archivo src/main/resources/db/migration/V1__create_initial_schema.sql contien
 
 -- ⚠️ IMPORTANTE: La contraseña está encriptada con BCrypt.
 -- Para generar tu propio hash:
--- 1. Ve a https://bcrypt-generator.com/
--- 2. Rounds: 10 (importante, debe coincidir con Spring Security)
--- 3. Escribe tu contraseña (ej: "admin123")
--- 4. Reemplaza el hash '$2a$10...' por el hash generado
+<ol>
+ <li>Ve a https://bcrypt-generator.com/</li>
+ <li>Rounds: 10 (importante, debe coincidir con Spring Security)</li>
+ <li>Escribe tu contraseña (ej: "admin123")</li>
+ <li>Reemplaza el hash '$2a$10...' por el hash generado</li>
+</ol>
 
 ### 4. Configurar application.properties
-Copia application-example.properties a src/main/resources/application.properties y completa tus credenciales.
+
+<p>Copia application-example.properties a src/main/resources/application.properties y completa tus credenciales.</p>
 ---
 
 ### 5. Ejecutar aplicación
